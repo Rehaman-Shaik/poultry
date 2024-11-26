@@ -5,21 +5,36 @@ import { Input } from '../components/ui/Input';
 import { Bird } from 'lucide-react';
 
 export const Login = () => {
-  const [username, setUsername] = useState('');
+  const [name, setName] = useState('');
   const [password, setPassword] = useState('');
   const { setCurrentUser } = useStore();
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+    try {
+      const response = await fetch(`https://poultry.rehamanshaikofficial.xyz/api/user/find`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, password }),
+      });
+
+      var result = await response.json();
+      setCurrentUser({
+        id: result.user.id,
+        name: result.user.name,
+        role: 'admin',
+      });
+    } catch (error) {
+      console.log(error);
+    }
     // Simplified login logic for demo
-    if (username === 'admin' && password === 'admin') {
+    if (name === 'admin' && password === 'admin') {
       setCurrentUser({
         id: '1',
         name: 'Admin User',
         role: 'admin',
       });
-    } else if (username === 'driver' && password === 'driver') {
+    } else if (name === 'driver' && password === 'driver') {
       setCurrentUser({
         id: '2',
         name: 'Driver User',
@@ -45,8 +60,8 @@ export const Login = () => {
             <Input
               id="username"
               type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              value={name}
+              onChange={(e) => setName(e.target.value)}
               required
             />
           </div>
@@ -64,7 +79,7 @@ export const Login = () => {
             />
           </div>
 
-          <Button type="submit" className="w-full">
+          <Button onClick={handleLogin} type="submit" className="w-full">
             Sign In
           </Button>
         </form>
