@@ -1,4 +1,4 @@
-import React from 'react';
+import { useEffect, useState } from 'react';  // Import useEffect and useState
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Layout } from './components/Layout';
 import { Dashboard } from './pages/Dashboard';
@@ -7,10 +7,17 @@ import { Sales } from './pages/Sales';
 import { Stock } from './pages/Stock';
 import { Reports } from './pages/Reports';
 import { Login } from './pages/Login';
-import { useStore } from './store/useStore';
 
 function App() {
-  const { currentUser } = useStore();
+  const [currentUser, setCurrentUser] = useState(null);
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem('currentUser');
+    if (storedUser) {
+      const parsedUser = JSON.parse(storedUser);
+      setCurrentUser(parsedUser);
+    }
+  }, []);
 
   if (!currentUser) {
     return <Login />;

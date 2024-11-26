@@ -1,5 +1,4 @@
-import React, { useState } from 'react';
-import { useStore } from '../store/useStore';
+import React, { useState, useEffect } from 'react';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { Bird } from 'lucide-react';
@@ -7,10 +6,19 @@ import { Bird } from 'lucide-react';
 export const Login = () => {
   const [name, setName] = useState('');
   const [password, setPassword] = useState('');
-  const { setCurrentUser } = useStore();
+  const [currentUser, setCurrentUser] = useState({});
+
+  // Store user data to localStorage when currentUser is updated
+  useEffect(() => {
+    if (currentUser) {
+      localStorage.setItem('currentUser', JSON.stringify(currentUser));
+    }
+  }, [currentUser]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // API call to authenticate user
     try {
       const response = await fetch(`https://poultry.rehamanshaikofficial.xyz/api/user/find`, {
         method: 'POST',
@@ -18,16 +26,21 @@ export const Login = () => {
         body: JSON.stringify({ name, password }),
       });
 
-      var result = await response.json();
-      setCurrentUser({
-        id: result.user.id,
-        name: result.user.name,
-        role: 'admin',
-      });
+      const result = await response.json();
+      if (result.user) {
+        setCurrentUser({
+          id: result.user.id,
+          name: result.user.name,
+          role: 'admin', // Adjust based on the response from your API
+        });
+      } else {
+        console.log("User not found.");
+      }
     } catch (error) {
       console.log(error);
     }
-    // Simplified login logic for demo
+
+    // Demo login logic for testing purposes
     if (name === 'admin' && password === 'admin') {
       setCurrentUser({
         id: '1',
@@ -79,7 +92,7 @@ export const Login = () => {
             />
           </div>
 
-          <Button onClick={handleLogin} type="submit" className="w-full">
+          <Button type="submit" className="w-full">
             Sign In
           </Button>
         </form>

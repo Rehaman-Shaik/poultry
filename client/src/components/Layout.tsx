@@ -1,4 +1,4 @@
-import React from 'react';
+import React , {useEffect, useState}from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { 
   LayoutDashboard, 
@@ -37,8 +37,16 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
   const location = useLocation();
   const { currentUser, setCurrentUser } = useStore();
 
+  useEffect(() => {
+    const storedUser = localStorage.getItem('currentUser');
+    if (storedUser) {
+      const parsedUser = JSON.parse(storedUser);
+      setCurrentUser(parsedUser);
+    }
+  }, []);
+  
   const handleLogout = () => {
-    setCurrentUser(null);
+    localStorage.removeItem('currentUser');
   };
 
   return (
